@@ -1,0 +1,1137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="FlightSight — Professional aerial photography and videography. Capturing breathtaking perspectives from above.">
+  <title>FlightSight — Aerial Photography & Videography</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Anton&family=Barlow+Condensed:wght@400;500;600;700&family=Figtree:ital,wght@0,300;0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <style>
+    /* ─── CUSTOM PROPERTIES ──────────────────────────────────────── */
+    :root {
+      --bg-deep:     #080910;
+      --bg-base:     #0C0D15;
+      --bg-surface:  #10121B;
+      --bg-elevated: #171A25;
+      --accent:      #38BDF8;
+      --accent-glow: rgba(56, 189, 248, 0.12);
+      --accent-dim:  #0EA5E9;
+      --text-primary:   #ECF2F9;
+      --text-secondary: #7E8EA4;
+      --text-muted:     #354055;
+      --border:         rgba(255,255,255,0.055);
+      --border-accent:  rgba(56,189,248,0.28);
+    }
+
+    /* ─── RESET & BASE ───────────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: 'Figtree', sans-serif;
+      background: var(--bg-deep);
+      color: var(--text-primary);
+      overflow-x: hidden;
+      -webkit-font-smoothing: antialiased;
+    }
+    img { display: block; }
+
+    /* ─── GRAIN OVERLAY ──────────────────────────────────────────── */
+    body::after {
+      content: '';
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 9999;
+      opacity: 0.028;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+      background-size: 180px 180px;
+    }
+
+    /* ─── SCROLLBAR ──────────────────────────────────────────────── */
+    ::-webkit-scrollbar { width: 3px; }
+    ::-webkit-scrollbar-track { background: var(--bg-deep); }
+    ::-webkit-scrollbar-thumb { background: var(--accent-dim); border-radius: 2px; }
+
+    /* ─── TYPOGRAPHY HELPERS ─────────────────────────────────────── */
+    .f-display  { font-family: 'Anton', sans-serif; }
+    .f-condensed{ font-family: 'Barlow Condensed', sans-serif; }
+    .f-body     { font-family: 'Figtree', sans-serif; }
+
+    /* ─── NAV ────────────────────────────────────────────────────── */
+    .nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      display: grid; grid-template-columns: 1fr auto 1fr; align-items: center;
+      padding: 1.5rem 3rem;
+      border-bottom: 1px solid transparent;
+      transition:
+        background  0.45s cubic-bezier(0.16,1,0.3,1),
+        padding     0.45s cubic-bezier(0.16,1,0.3,1),
+        border-color 0.45s cubic-bezier(0.16,1,0.3,1);
+    }
+    .nav.scrolled {
+      background: rgba(8,9,16,0.93);
+      backdrop-filter: blur(22px);
+      -webkit-backdrop-filter: blur(22px);
+      padding: 1rem 3rem;
+      border-bottom-color: var(--border);
+    }
+
+    .nav-left  { display: flex; align-items: center; justify-content: flex-end; }
+    .nav-center { display: flex; align-items: center; justify-content: center; margin: 0 20rem; }
+    .nav-right { display: flex; align-items: center; justify-content: flex-start; gap: 2rem; }
+
+    .nav-group { display: flex; align-items: center; gap: 1.5rem; list-style: none; }
+
+    .nav-group a {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 0.8rem; font-weight: 600; letter-spacing: 0.14em;
+      text-transform: uppercase; color: rgba(236,242,249,0.6);
+      text-decoration: none; position: relative;
+      transition: color 0.2s ease;
+    }
+    .nav-group a::after {
+      content: ''; position: absolute; bottom: -5px; left: 0;
+      width: 0; height: 1px; background: var(--accent);
+      transition: width 0.3s cubic-bezier(0.16,1,0.3,1);
+    }
+    .nav-group a:hover { color: var(--text-primary); }
+    .nav-group a:hover::after { width: 100%; }
+
+    /* Logo is already white on transparent — use as-is */
+    .nav-logo {
+      height: 42px; width: auto;
+      transition: transform 0.3s cubic-bezier(0.16,1,0.3,1), opacity 0.2s ease;
+    }
+    .nav-logo:hover { transform: scale(1.04); opacity: 0.82; }
+
+    .nav-cta {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 0.8rem; font-weight: 700; letter-spacing: 0.13em;
+      text-transform: uppercase; text-decoration: none;
+      color: var(--bg-deep); background: var(--accent);
+      padding: 0.6rem 1.4rem; border-radius: 2px;
+      transition: background 0.2s ease, transform 0.2s cubic-bezier(0.16,1,0.3,1), box-shadow 0.2s ease;
+    }
+    .nav-cta:hover {
+      background: #7DD3FC;
+      transform: translateY(-1px);
+      box-shadow: 0 6px 24px rgba(56,189,248,0.32);
+    }
+    .nav-cta:active { transform: translateY(0); }
+
+    .hamburger {
+      display: none; flex-direction: column; gap: 5px;
+      background: none; border: none; cursor: pointer; padding: 4px;
+    }
+    .hamburger span {
+      display: block; width: 22px; height: 1.5px;
+      background: var(--text-primary);
+      transition: transform 0.3s ease, opacity 0.3s ease;
+    }
+
+    /* ─── MOBILE NAV ─────────────────────────────────────────────── */
+    .mobile-nav {
+      display: none; position: fixed; inset: 0; z-index: 98;
+      background: rgba(8,9,16,0.97); backdrop-filter: blur(24px);
+      flex-direction: column; align-items: center; justify-content: center; gap: 2rem;
+    }
+    .mobile-nav.open { display: flex; }
+    .mobile-nav a {
+      font-family: 'Anton', sans-serif; font-size: 2.75rem;
+      color: var(--text-primary); text-decoration: none;
+      text-transform: uppercase; letter-spacing: 0.04em;
+      transition: color 0.2s ease;
+    }
+    .mobile-nav a:hover { color: var(--accent); }
+
+    /* ─── HERO ───────────────────────────────────────────────────── */
+    .hero {
+      position: relative; height: 100vh; min-height: 680px;
+      overflow: hidden; display: flex; align-items: center; justify-content: center;
+    }
+    .hero-video {
+      position: absolute; inset: 0;
+      width: 100%; height: 100%; object-fit: cover; object-position: center;
+      z-index: 0;
+    }
+    .hero-overlay {
+      position: absolute; inset: 0; z-index: 1;
+      background:
+        linear-gradient(to bottom,
+          rgba(8,9,16,0.45) 0%,
+          rgba(8,9,16,0.1)  25%,
+          rgba(8,9,16,0.1)  60%,
+          rgba(8,9,16,0.92) 100%
+        ),
+        linear-gradient(to right, rgba(8,9,16,0.25) 0%, transparent 25%, transparent 75%, rgba(8,9,16,0.25) 100%);
+    }
+    .hero-vignette {
+      position: absolute; inset: 0; z-index: 2;
+      background: radial-gradient(ellipse at center, transparent 45%, rgba(8,9,16,0.55) 100%);
+    }
+    .hero-content {
+      position: relative; z-index: 3;
+      text-align: center; padding: 5rem 1.5rem 0; max-width: 1060px;
+    }
+
+    .hero-label {
+      display: inline-flex; align-items: center; gap: 0.875rem;
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 0.78rem; font-weight: 600; letter-spacing: 0.22em;
+      text-transform: uppercase; color: var(--accent);
+      margin-bottom: 1.75rem;
+      opacity: 0; animation: fadeUp 0.8s cubic-bezier(0.16,1,0.3,1) 0.3s forwards;
+    }
+    .hero-label::before, .hero-label::after {
+      content: ''; display: block; height: 1px; width: 36px;
+      background: var(--accent); opacity: 0.55;
+    }
+
+    .hero-h1 {
+      font-family: 'Anton', sans-serif;
+      font-size: clamp(3rem, 7vw, 6.75rem);
+      line-height: 0.92; letter-spacing: -0.015em;
+      color: var(--text-primary); text-transform: uppercase;
+      opacity: 0; animation: fadeUp 0.95s cubic-bezier(0.16,1,0.3,1) 0.5s forwards;
+    }
+    .hero-h1 .accent { color: var(--accent); }
+
+    .hero-sub {
+      font-size: clamp(0.9rem, 1.4vw, 1.1rem); font-weight: 300;
+      line-height: 1.78; color: rgba(236,242,249,0.6);
+      margin: 1.875rem auto 0; max-width: 500px;
+      opacity: 0; animation: fadeUp 0.95s cubic-bezier(0.16,1,0.3,1) 0.72s forwards;
+    }
+
+    .hero-actions {
+      display: flex; gap: 1rem; justify-content: center;
+      margin-top: 2.5rem; flex-wrap: wrap;
+      opacity: 0; animation: fadeUp 0.95s cubic-bezier(0.16,1,0.3,1) 0.9s forwards;
+    }
+
+    .scroll-indicator {
+      position: absolute; bottom: 2.5rem; left: 50%; transform: translateX(-50%);
+      z-index: 3; display: flex; flex-direction: column; align-items: center; gap: 0.5rem;
+      opacity: 0; animation: fadeIn 1s ease 1.6s forwards;
+    }
+    .scroll-indicator span {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 0.65rem; letter-spacing: 0.22em; text-transform: uppercase;
+      color: rgba(236,242,249,0.35);
+    }
+    .scroll-line {
+      width: 1px; height: 44px;
+      background: linear-gradient(to bottom, rgba(56,189,248,0.65), transparent);
+      animation: scrollPulse 2s ease-in-out infinite;
+    }
+
+    /* ─── BUTTONS ────────────────────────────────────────────────── */
+    .btn-primary {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 0.9rem; font-weight: 700; letter-spacing: 0.12em;
+      text-transform: uppercase; text-decoration: none;
+      padding: 0.9rem 2.25rem; border-radius: 2px;
+      background: var(--accent); color: var(--bg-deep);
+      border: none; cursor: pointer; display: inline-block;
+      transition: background 0.2s ease, transform 0.2s cubic-bezier(0.16,1,0.3,1), box-shadow 0.2s ease;
+    }
+    .btn-primary:hover {
+      background: #7DD3FC; transform: translateY(-2px);
+      box-shadow: 0 10px 32px rgba(56,189,248,0.38);
+    }
+    .btn-primary:active { transform: translateY(0); }
+
+    .btn-ghost {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 0.9rem; font-weight: 700; letter-spacing: 0.12em;
+      text-transform: uppercase; text-decoration: none;
+      padding: 0.9rem 2.25rem; border-radius: 2px;
+      background: transparent; color: var(--text-primary);
+      border: 1px solid rgba(255,255,255,0.18);
+      transition: border-color 0.2s ease, background 0.2s ease, transform 0.2s cubic-bezier(0.16,1,0.3,1);
+    }
+    .btn-ghost:hover {
+      border-color: rgba(255,255,255,0.45);
+      background: rgba(255,255,255,0.05);
+      transform: translateY(-2px);
+    }
+    .btn-ghost:active { transform: translateY(0); }
+
+    /* ─── SECTION HELPERS ────────────────────────────────────────── */
+    .container { max-width: 1200px; margin: 0 auto; padding: 0 3rem; }
+
+    .section-eyebrow {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 0.72rem; font-weight: 600; letter-spacing: 0.22em;
+      text-transform: uppercase; color: var(--accent); margin-bottom: 0.875rem;
+      display: block;
+    }
+    .section-title {
+      font-family: 'Anton', sans-serif;
+      font-size: clamp(2.5rem, 5vw, 4rem);
+      line-height: 0.95; letter-spacing: -0.01em;
+      color: var(--text-primary); text-transform: uppercase;
+    }
+    .section-rule {
+      width: 36px; height: 2px; background: var(--accent);
+    }
+
+    /* ─── ABOUT STRIP ────────────────────────────────────────────── */
+    .about-section {
+      background: var(--bg-base);
+      padding: 6rem 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .about-grid {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 5rem; align-items: center;
+    }
+
+    /* ─── SERVICES ───────────────────────────────────────────────── */
+    .services-section { padding: 7rem 0; background: var(--bg-surface); }
+
+    .services-grid {
+      display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.125rem;
+      margin-top: 4rem;
+    }
+
+    .service-card {
+      background: var(--bg-elevated); border: 1px solid var(--border);
+      border-radius: 3px; padding: 2.25rem; position: relative; overflow: hidden;
+      transition: border-color 0.3s ease, transform 0.35s cubic-bezier(0.16,1,0.3,1), box-shadow 0.35s ease;
+    }
+    .service-card::before {
+      content: ''; position: absolute; inset: 0;
+      background: radial-gradient(ellipse at top left, var(--accent-glow), transparent 60%);
+      opacity: 0; transition: opacity 0.4s ease;
+    }
+    .service-card:hover {
+      border-color: var(--border-accent); transform: translateY(-5px);
+      box-shadow: 0 24px 64px rgba(0,0,0,0.5), 0 0 0 1px var(--border-accent);
+    }
+    .service-card:hover::before { opacity: 1; }
+
+    .card-number {
+      font-family: 'Anton', sans-serif; font-size: 5.5rem;
+      line-height: 1; color: rgba(56,189,248,0.06);
+      position: absolute; top: 1rem; right: 1rem; user-select: none; pointer-events: none;
+    }
+    .card-icon {
+      width: 44px; height: 44px; color: var(--accent);
+      margin-bottom: 1.5rem; position: relative; z-index: 1;
+    }
+    .card-title {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 1.375rem; font-weight: 700; letter-spacing: 0.03em;
+      text-transform: uppercase; color: var(--text-primary);
+      margin-bottom: 0.75rem; position: relative; z-index: 1;
+    }
+    .card-desc {
+      font-size: 0.9rem; line-height: 1.72;
+      color: var(--text-secondary); position: relative; z-index: 1;
+    }
+    .card-link {
+      display: inline-flex; align-items: center; gap: 0.5rem;
+      margin-top: 1.5rem; font-family: 'Barlow Condensed', sans-serif;
+      font-size: 0.8rem; font-weight: 600; letter-spacing: 0.13em;
+      text-transform: uppercase; color: var(--accent); text-decoration: none;
+      position: relative; z-index: 1;
+      transition: gap 0.25s cubic-bezier(0.16,1,0.3,1);
+    }
+    .card-link:hover { gap: 0.875rem; }
+
+    /* ─── PORTFOLIO ──────────────────────────────────────────────── */
+    .portfolio-section { padding: 7rem 0; background: var(--bg-base); }
+
+    .portfolio-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      grid-template-rows: 290px 290px;
+      gap: 0.625rem;
+      margin-top: 3rem;
+    }
+    .p-item { position: relative; overflow: hidden; border-radius: 2px; }
+    .p-item:first-child { grid-row: span 2; }
+
+    .p-img {
+      width: 100%; height: 100%; object-fit: cover;
+      transition: transform 0.65s cubic-bezier(0.16,1,0.3,1);
+    }
+    .p-item:hover .p-img { transform: scale(1.06); }
+
+    .p-overlay {
+      position: absolute; inset: 0;
+      background: linear-gradient(to top, rgba(8,9,16,0.85) 0%, transparent 55%);
+      opacity: 0; transition: opacity 0.3s ease;
+    }
+    .p-item:hover .p-overlay { opacity: 1; }
+
+    .p-info {
+      position: absolute; bottom: 0; left: 0; right: 0; padding: 1.5rem;
+      transform: translateY(10px); opacity: 0;
+      transition: transform 0.35s cubic-bezier(0.16,1,0.3,1), opacity 0.35s ease;
+    }
+    .p-item:hover .p-info { transform: translateY(0); opacity: 1; }
+
+    .p-cat {
+      font-family: 'Barlow Condensed', sans-serif; font-size: 0.7rem;
+      font-weight: 600; letter-spacing: 0.18em; text-transform: uppercase;
+      color: var(--accent); margin-bottom: 0.25rem; display: block;
+    }
+    .p-title {
+      font-family: 'Barlow Condensed', sans-serif; font-size: 1.1rem;
+      font-weight: 700; text-transform: uppercase; color: var(--text-primary);
+    }
+
+    /* ─── EQUIPMENT ──────────────────────────────────────────────── */
+    .equipment-section {
+      padding: 8rem 0; background: var(--bg-deep);
+      position: relative; overflow: hidden;
+    }
+    .equipment-section::before {
+      content: ''; position: absolute; right: -100px; top: 50%;
+      transform: translateY(-50%);
+      width: 700px; height: 700px;
+      background: radial-gradient(ellipse, rgba(56,189,248,0.07) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .equipment-grid {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 6rem; align-items: center;
+    }
+
+    .equip-badge {
+      display: inline-block;
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 0.72rem; font-weight: 600; letter-spacing: 0.16em;
+      text-transform: uppercase; color: var(--accent);
+      padding: 0.375rem 0.875rem;
+      background: var(--accent-glow); border: 1px solid var(--border-accent);
+      border-radius: 2px; margin-bottom: 1.5rem;
+    }
+
+    .specs-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem 2.5rem; }
+    .spec-val {
+      font-family: 'Anton', sans-serif; font-size: 2.25rem; line-height: 1;
+      color: var(--text-primary); display: block;
+    }
+    .spec-lbl {
+      font-size: 0.8rem; font-weight: 500; color: var(--text-secondary);
+      letter-spacing: 0.04em; margin-top: 0.2rem; display: block;
+    }
+
+    .drone-wrap { display: flex; align-items: center; justify-content: center; }
+
+    .drone-img {
+      width: 100%; max-width: 560px;
+    }
+
+    /* ─── STATS ──────────────────────────────────────────────────── */
+    .stats-section {
+      padding: 5.5rem 0; background: var(--bg-surface);
+      border-top: 1px solid var(--border); border-bottom: 1px solid var(--border);
+    }
+    .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 2rem; }
+    .stat-item { text-align: center; }
+    .stat-num {
+      font-family: 'Anton', sans-serif;
+      font-size: clamp(2.5rem, 4vw, 3.75rem);
+      color: var(--accent); line-height: 1; display: block;
+    }
+    .stat-lbl {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 0.8rem; font-weight: 600; letter-spacing: 0.14em;
+      text-transform: uppercase; color: var(--text-secondary);
+      margin-top: 0.5rem; display: block;
+    }
+
+    /* ─── PROCESS ────────────────────────────────────────────────── */
+    .process-section { padding: 7rem 0; background: var(--bg-base); }
+    .process-grid {
+      display: grid; grid-template-columns: repeat(4, 1fr); gap: 2.5rem;
+      margin-top: 4.5rem;
+    }
+    .process-step { position: relative; }
+    .step-num {
+      font-family: 'Anton', sans-serif; font-size: 5.5rem; line-height: 1;
+      color: var(--bg-elevated); display: block; margin-bottom: 0.75rem;
+    }
+    .step-connector {
+      position: absolute; top: 3rem; right: -1.5rem; width: 3rem;
+      height: 1px; background: linear-gradient(to right, var(--accent-dim), transparent);
+    }
+    .step-title {
+      font-family: 'Barlow Condensed', sans-serif; font-size: 1.25rem;
+      font-weight: 700; text-transform: uppercase; color: var(--text-primary);
+      margin-bottom: 0.75rem; letter-spacing: 0.03em;
+    }
+    .step-desc { font-size: 0.9rem; line-height: 1.72; color: var(--text-secondary); }
+
+    /* ─── CONTACT / CTA ──────────────────────────────────────────── */
+    .contact-section {
+      padding: 8rem 0; background: var(--bg-deep); position: relative; overflow: hidden;
+    }
+    .contact-section::before {
+      content: ''; position: absolute; top: -80px; left: 50%; transform: translateX(-50%);
+      width: 700px; height: 500px;
+      background: radial-gradient(ellipse, rgba(56,189,248,0.07) 0%, transparent 65%);
+      pointer-events: none;
+    }
+    .contact-inner { max-width: 760px; margin: 0 auto; text-align: center; position: relative; }
+
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1.125rem; }
+    .form-group { text-align: left; }
+    .form-label {
+      display: block; font-family: 'Barlow Condensed', sans-serif;
+      font-size: 0.75rem; font-weight: 600; letter-spacing: 0.14em;
+      text-transform: uppercase; color: var(--text-secondary); margin-bottom: 0.5rem;
+    }
+    .form-input {
+      width: 100%; background: var(--bg-elevated); border: 1px solid var(--border);
+      border-radius: 2px; padding: 0.875rem 1.125rem;
+      font-family: 'Figtree', sans-serif; font-size: 0.9rem;
+      color: var(--text-primary); outline: none;
+      transition: border-color 0.2s ease, box-shadow 0.2s ease;
+      -webkit-appearance: none;
+    }
+    .form-input::placeholder { color: var(--text-muted); }
+    .form-input:focus {
+      border-color: var(--border-accent);
+      box-shadow: 0 0 0 3px rgba(56,189,248,0.08);
+    }
+
+    /* ─── FOOTER ─────────────────────────────────────────────────── */
+    .footer {
+      background: var(--bg-base); border-top: 1px solid var(--border); padding: 2.75rem 0;
+    }
+    .footer-inner {
+      display: flex; align-items: center; justify-content: space-between;
+      flex-wrap: wrap; gap: 2rem;
+    }
+    .footer-logo { height: 40px; filter: invert(1) brightness(0.85); }
+    .footer-nav { display: flex; gap: 2.25rem; flex-wrap: wrap; }
+    .footer-link {
+      font-family: 'Barlow Condensed', sans-serif; font-size: 0.78rem;
+      font-weight: 600; letter-spacing: 0.13em; text-transform: uppercase;
+      color: var(--text-secondary); text-decoration: none;
+      transition: color 0.2s ease;
+    }
+    .footer-link:hover { color: var(--text-primary); }
+    .footer-copy {
+      font-size: 0.78rem; color: var(--text-muted);
+    }
+
+    /* ─── SCROLL REVEAL ──────────────────────────────────────────── */
+    .reveal {
+      opacity: 0; transform: translateY(28px);
+      transition: opacity 0.75s cubic-bezier(0.16,1,0.3,1), transform 0.75s cubic-bezier(0.16,1,0.3,1);
+    }
+    .reveal.visible { opacity: 1; transform: translateY(0); }
+    .d1 { transition-delay: 0.1s; } .d2 { transition-delay: 0.2s; }
+    .d3 { transition-delay: 0.3s; } .d4 { transition-delay: 0.4s; }
+
+    /* ─── KEYFRAMES ──────────────────────────────────────────────── */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(22px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; } to { opacity: 1; }
+    }
+    @keyframes scrollPulse {
+      0%, 100% { transform: scaleY(1); opacity: 0.55; }
+      50%       { transform: scaleY(0.65); opacity: 1; }
+    }
+    @keyframes glowPulse {
+      0%, 100% { opacity: 0.8; transform: translate(-50%,-50%) scale(1); }
+      50%       { opacity: 1;   transform: translate(-50%,-50%) scale(1.12); }
+    }
+
+    /* ─── RESPONSIVE ─────────────────────────────────────────────── */
+    @media (max-width: 1024px) {
+      .services-grid { grid-template-columns: repeat(2, 1fr); }
+      .process-grid  { grid-template-columns: repeat(2, 1fr); }
+      .stats-grid    { grid-template-columns: repeat(2, 1fr); }
+      .step-connector { display: none; }
+      .equipment-grid { grid-template-columns: 1fr; gap: 3rem; }
+      .drone-wrap { order: -1; }
+      .drone-img { max-width: 420px; }
+    }
+    @media (max-width: 768px) {
+      .nav { padding: 1.25rem 1.5rem; grid-template-columns: auto 1fr auto; }
+      .nav.scrolled { padding: 1rem 1.5rem; }
+      .nav-left { display: none; }
+      .nav-center { justify-content: flex-start; }
+      .nav-right .nav-group, .nav-right .nav-cta { display: none; }
+      .hamburger { display: flex; }
+      .nav-right { gap: 0; }
+      .container { padding: 0 1.5rem; }
+      .about-grid { grid-template-columns: 1fr; gap: 2.5rem; }
+      .services-grid { grid-template-columns: 1fr; }
+      .portfolio-grid {
+        grid-template-columns: 1fr 1fr;
+        grid-template-rows: auto;
+      }
+      .p-item:first-child { grid-row: span 1; }
+      .stats-grid { grid-template-columns: repeat(2, 1fr); }
+      .process-grid { grid-template-columns: 1fr; }
+      .equipment-grid { grid-template-columns: 1fr; gap: 2.5rem; }
+      .form-row { grid-template-columns: 1fr; }
+      .footer-inner { flex-direction: column; align-items: flex-start; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!--  NAVIGATION                                                     -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<nav class="nav" id="nav">
+
+  <!-- Left links -->
+  <div class="nav-left">
+    <ul class="nav-group">
+      <li><a href="#about">About</a></li>
+      <li><a href="#services">Services</a></li>
+      <li><a href="#portfolio">Portfolio</a></li>
+    </ul>
+  </div>
+
+  <!-- Center: Logo always perfectly centered -->
+  <div class="nav-center">
+    <a href="#" aria-label="FlightSight home">
+      <img src="brand_assets/image-removebg-preview.png" alt="FlightSight" class="nav-logo">
+    </a>
+  </div>
+
+  <!-- Right: links + CTA + hamburger -->
+  <div class="nav-right">
+    <ul class="nav-group">
+      <li><a href="#equipment">Equipment</a></li>
+      <li><a href="#process">Process</a></li>
+      <li><a href="#contact">Contact</a></li>
+    </ul>
+    <a href="#contact" class="nav-cta">Book a Shoot</a>
+    <button class="hamburger" id="menuBtn" aria-label="Open menu">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+
+</nav>
+
+<div class="mobile-nav" id="mobileNav">
+  <a href="#about"     onclick="closeMobileNav()">About</a>
+  <a href="#services"  onclick="closeMobileNav()">Services</a>
+  <a href="#portfolio" onclick="closeMobileNav()">Portfolio</a>
+  <a href="#equipment" onclick="closeMobileNav()">Equipment</a>
+  <a href="#process"   onclick="closeMobileNav()">Process</a>
+  <a href="#contact"   onclick="closeMobileNav()">Book a Shoot</a>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!--  HERO                                                           -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<section class="hero" id="home">
+  <video class="hero-video" autoplay muted loop playsinline>
+    <source src="brand_assets/v09044g40000d2c0j7nog65lk6h4tis0.MP4" type="video/mp4">
+  </video>
+  <div class="hero-overlay"></div>
+  <div class="hero-vignette"></div>
+
+  <div class="hero-content">
+    <p class="hero-label">Professional Aerial Cinematography</p>
+    <h1 class="hero-h1">
+      We Capture<br>
+      <span class="accent">What The</span><br>
+      Eye Can't Reach
+    </h1>
+    <p class="hero-sub">
+      Breathtaking aerial photography and cinematic videography — transforming how the world sees your vision from thousands of feet above.
+    </p>
+    <div class="hero-actions">
+      <a href="#portfolio" class="btn-primary">View Our Work</a>
+      <a href="#contact"   class="btn-ghost">Book a Shoot &rarr;</a>
+    </div>
+  </div>
+
+  <div class="scroll-indicator">
+    <div class="scroll-line"></div>
+    <span>Scroll</span>
+  </div>
+</section>
+
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!--  ABOUT                                                          -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<section class="about-section" id="about">
+  <div class="container">
+    <div class="about-grid">
+      <div class="reveal">
+        <span class="section-eyebrow">About FlightSight</span>
+        <h2 class="section-title" style="margin-bottom:1.75rem;">
+          Aerial Vision,<br>Ground-Breaking<br>Results
+        </h2>
+        <div class="section-rule"></div>
+      </div>
+      <div class="reveal d2">
+        <p style="font-size:1rem;line-height:1.82;color:var(--text-secondary);margin-bottom:1.25rem;">
+          FlightSight is a professional aerial photography and videography company dedicated to capturing the world from perspectives that leave audiences breathless. We combine technical precision with artistic vision to deliver content that truly stands out.
+        </p>
+        <p style="font-size:1rem;line-height:1.82;color:var(--text-secondary);margin-bottom:2rem;">
+          From real estate and commercial campaigns to weddings and events, we bring a cinematic eye to every flight — turning altitude into artistry.
+        </p>
+        <a href="#contact" class="btn-primary">Start a Project</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!--  SERVICES                                                       -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<section class="services-section" id="services">
+  <div class="container">
+
+    <div style="text-align:center;" class="reveal">
+      <span class="section-eyebrow">What We Do</span>
+      <h2 class="section-title">Our Services</h2>
+      <div class="section-rule" style="margin:1rem auto 0;"></div>
+    </div>
+
+    <div class="services-grid">
+
+      <!-- 01 Aerial Photography -->
+      <div class="service-card reveal d1">
+        <span class="card-number">01</span>
+        <svg class="card-icon" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="4" y="12" width="40" height="28" rx="3"/>
+          <circle cx="24" cy="26" r="7"/>
+          <circle cx="24" cy="26" r="3"/>
+          <path d="M16 12V9a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v3"/>
+          <circle cx="36" cy="18" r="1.5" fill="currentColor"/>
+        </svg>
+        <h3 class="card-title">Aerial Photography</h3>
+        <p class="card-desc">High-resolution stills from above. Perfect for real estate, construction sites, landscapes, and commercial campaigns.</p>
+        <a href="#contact" class="card-link">
+          Enquire
+          <svg width="13" height="13" viewBox="0 0 13 13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+            <path d="M2 6.5h9M6.5 2l4.5 4.5-4.5 4.5"/>
+          </svg>
+        </a>
+      </div>
+
+      <!-- 02 Cinematic Video -->
+      <div class="service-card reveal d2">
+        <span class="card-number">02</span>
+        <svg class="card-icon" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="4" y="10" width="32" height="24" rx="3"/>
+          <path d="M36 19l8-6v18l-8-6"/>
+          <rect x="9" y="15" width="5" height="5" rx="1"/>
+        </svg>
+        <h3 class="card-title">Cinematic Video</h3>
+        <p class="card-desc">Smooth, dramatic aerial footage in stunning 4K. Ideal for commercials, short films, promos, and brand storytelling.</p>
+        <a href="#contact" class="card-link">
+          Enquire
+          <svg width="13" height="13" viewBox="0 0 13 13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+            <path d="M2 6.5h9M6.5 2l4.5 4.5-4.5 4.5"/>
+          </svg>
+        </a>
+      </div>
+
+      <!-- 03 Real Estate -->
+      <div class="service-card reveal d3">
+        <span class="card-number">03</span>
+        <svg class="card-icon" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 42V22L24 10l12 12v20"/>
+          <rect x="20" y="30" width="8" height="12"/>
+          <path d="M8 22H4L24 2l20 20h-4"/>
+        </svg>
+        <h3 class="card-title">Real Estate</h3>
+        <p class="card-desc">Showcase properties from their best angles. Aerial views that help homes sell faster and command higher prices.</p>
+        <a href="#contact" class="card-link">
+          Enquire
+          <svg width="13" height="13" viewBox="0 0 13 13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+            <path d="M2 6.5h9M6.5 2l4.5 4.5-4.5 4.5"/>
+          </svg>
+        </a>
+      </div>
+
+      <!-- 04 Events & Weddings -->
+      <div class="service-card reveal d4">
+        <span class="card-number">04</span>
+        <svg class="card-icon" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M24 8l3.5 7.5 8.5 1.2-6 5.8 1.5 8.3L24 27l-7.5 3.8 1.5-8.3-6-5.8 8.5-1.2z"/>
+          <path d="M8 42c0-8.8 7.2-16 16-16s16 7.2 16 16"/>
+        </svg>
+        <h3 class="card-title">Events & Weddings</h3>
+        <p class="card-desc">Capture special moments from the sky. Weddings, festivals, corporate events — preserved in sweeping aerial coverage.</p>
+        <a href="#contact" class="card-link">
+          Enquire
+          <svg width="13" height="13" viewBox="0 0 13 13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+            <path d="M2 6.5h9M6.5 2l4.5 4.5-4.5 4.5"/>
+          </svg>
+        </a>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!--  PORTFOLIO                                                      -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<section class="portfolio-section" id="portfolio">
+  <div class="container">
+
+    <div style="display:flex;align-items:flex-end;justify-content:space-between;flex-wrap:wrap;gap:1.5rem;" class="reveal">
+      <div>
+        <span class="section-eyebrow">Our Work</span>
+        <h2 class="section-title">Portfolio</h2>
+      </div>
+      <a href="#contact" class="btn-ghost" style="margin-bottom:0.2rem;">View All Projects</a>
+    </div>
+
+    <div class="portfolio-grid reveal d1">
+
+      <!-- Item 1 — spans 2 rows — actual drone-in-sky image -->
+      <div class="p-item">
+        <img src="brand_assets/droneinsky.png" alt="Drone flying over coastal road at golden hour" class="p-img">
+        <div class="p-overlay"></div>
+        <div class="p-info">
+          <span class="p-cat">Coastal Survey</span>
+          <span class="p-title">Pacific Coastline</span>
+        </div>
+      </div>
+
+      <!-- Item 2 -->
+      <div class="p-item">
+        <img src="https://placehold.co/700x290/0A1422/1A5F82?text=" alt="Aerial real estate shoot" class="p-img" style="filter:brightness(0.75) saturate(1.1);">
+        <div class="p-overlay"></div>
+        <div class="p-info">
+          <span class="p-cat">Real Estate</span>
+          <span class="p-title">Luxury Estate Portfolio</span>
+        </div>
+      </div>
+
+      <!-- Item 3 -->
+      <div class="p-item">
+        <img src="https://placehold.co/700x290/091220/124F6A?text=" alt="Aerial commercial shoot" class="p-img" style="filter:brightness(0.7) saturate(0.9);">
+        <div class="p-overlay"></div>
+        <div class="p-info">
+          <span class="p-cat">Commercial</span>
+          <span class="p-title">Brand Campaign</span>
+        </div>
+      </div>
+
+      <!-- Item 4 -->
+      <div class="p-item">
+        <img src="https://placehold.co/700x290/0B1828/1A6E96?text=" alt="Cinematic aerial videography" class="p-img" style="filter:brightness(0.7) saturate(0.9);">
+        <div class="p-overlay"></div>
+        <div class="p-info">
+          <span class="p-cat">Videography</span>
+          <span class="p-title">Corporate Showreel</span>
+        </div>
+      </div>
+
+      <!-- Item 5 -->
+      <div class="p-item">
+        <img src="https://placehold.co/700x290/08111C/0F5570?text=" alt="Aerial wedding shoot" class="p-img" style="filter:brightness(0.7) saturate(0.85);">
+        <div class="p-overlay"></div>
+        <div class="p-info">
+          <span class="p-cat">Weddings</span>
+          <span class="p-title">Garden Ceremony</span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!--  EQUIPMENT (DJI Mini 3)                                         -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<section class="equipment-section" id="equipment">
+  <div class="container">
+    <div class="equipment-grid">
+
+      <!-- Text -->
+      <div class="reveal">
+        <span class="equip-badge">Our Equipment</span>
+        <h2 class="section-title" style="margin-bottom:1.625rem;">
+          DJI Mini 3<br>Pro
+        </h2>
+        <p style="font-size:1rem;line-height:1.82;color:var(--text-secondary);margin-bottom:2.5rem;">
+          We fly with the DJI Mini 3 — a professional-grade drone that packs extraordinary imaging capability into an ultra-compact body. Its 4K camera system, tri-directional obstacle sensing, and class-leading flight time make it our go-to for every single shoot.
+        </p>
+
+        <div class="specs-grid" style="margin-bottom:2.75rem;">
+          <div>
+            <span class="spec-val">4K</span>
+            <span class="spec-lbl">Ultra HD Video</span>
+          </div>
+          <div>
+            <span class="spec-val">38 Min</span>
+            <span class="spec-lbl">Max Flight Time</span>
+          </div>
+          <div>
+            <span class="spec-val">18 km</span>
+            <span class="spec-lbl">Transmission Range</span>
+          </div>
+          <div>
+            <span class="spec-val">248 g</span>
+            <span class="spec-lbl">Ultra-Lightweight</span>
+          </div>
+          <div>
+            <span class="spec-val">12 MP</span>
+            <span class="spec-lbl">Photo Resolution</span>
+          </div>
+          <div>
+            <span class="spec-val">3-Dir</span>
+            <span class="spec-lbl">Obstacle Sensing</span>
+          </div>
+        </div>
+
+        <a href="#contact" class="btn-primary">Book a Shoot</a>
+      </div>
+
+      <!-- Image -->
+      <div class="drone-wrap reveal d2">
+        <img src="brand_assets/djimini3-no_background.png" alt="DJI Mini 3 Pro drone" class="drone-img">
+      </div>
+
+    </div>
+  </div>
+</section>
+
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!--  STATS                                                          -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<section class="stats-section">
+  <div class="container">
+    <div class="stats-grid">
+
+      <div class="stat-item reveal">
+        <span class="stat-num" data-count="500" data-suffix="+">0+</span>
+        <span class="stat-lbl">Flights Completed</span>
+      </div>
+      <div class="stat-item reveal d1">
+        <span class="stat-num" data-count="200" data-suffix="+">0+</span>
+        <span class="stat-lbl">Happy Clients</span>
+      </div>
+      <div class="stat-item reveal d2">
+        <span class="stat-num">4K</span>
+        <span class="stat-lbl">Ultra HD Capture</span>
+      </div>
+      <div class="stat-item reveal d3">
+        <span class="stat-num" data-count="3" data-suffix=" Yrs">0</span>
+        <span class="stat-lbl">Years in the Sky</span>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!--  PROCESS                                                        -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<section class="process-section" id="process">
+  <div class="container">
+
+    <div style="text-align:center;" class="reveal">
+      <span class="section-eyebrow">How It Works</span>
+      <h2 class="section-title">Our Process</h2>
+      <div class="section-rule" style="margin:1rem auto 0;"></div>
+    </div>
+
+    <div class="process-grid">
+
+      <div class="process-step reveal d1">
+        <span class="step-num">01</span>
+        <div class="step-connector"></div>
+        <h3 class="step-title">Consultation</h3>
+        <p class="step-desc">We discuss your vision, requirements, location, and timeline — building a clear plan before anything takes flight.</p>
+      </div>
+
+      <div class="process-step reveal d2">
+        <span class="step-num">02</span>
+        <div class="step-connector"></div>
+        <h3 class="step-title">Flight Planning</h3>
+        <p class="step-desc">We scout the location, check airspace regulations, weather conditions, and map optimal flight paths for safety and coverage.</p>
+      </div>
+
+      <div class="process-step reveal d3">
+        <span class="step-num">03</span>
+        <div class="step-connector"></div>
+        <h3 class="step-title">Capture</h3>
+        <p class="step-desc">Our pilot executes the shoot with precision — capturing stunning footage and stills across every planned angle and altitude.</p>
+      </div>
+
+      <div class="process-step reveal d4">
+        <span class="step-num">04</span>
+        <h3 class="step-title">Edit & Deliver</h3>
+        <p class="step-desc">Professional colour grading and post-production. Finished assets delivered within 48–72 hours, ready to use.</p>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!--  CONTACT / BOOK                                                 -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<section class="contact-section" id="contact">
+  <div class="container">
+    <div class="contact-inner">
+
+      <span class="section-eyebrow reveal">Book Your Shoot</span>
+      <h2 class="section-title reveal" style="font-size:clamp(2.75rem,5.5vw,4.75rem);margin-bottom:1.125rem;">
+        Ready to<br>Take Flight?
+      </h2>
+      <p style="font-size:0.975rem;line-height:1.82;color:var(--text-secondary);margin-bottom:3rem;max-width:540px;margin-left:auto;margin-right:auto;" class="reveal">
+        Tell us about your project and we'll get back to you within 24 hours to discuss how we can capture your vision from above.
+      </p>
+
+      <form style="text-align:left;display:grid;gap:1.125rem;" class="reveal" onsubmit="handleSubmit(event)">
+
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label" for="name">Name</label>
+            <input id="name" type="text" class="form-input" placeholder="Your full name" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="email">Email</label>
+            <input id="email" type="email" class="form-input" placeholder="you@example.com" required>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="service">Project Type</label>
+          <select id="service" class="form-input" style="cursor:pointer;" required>
+            <option value="" disabled selected>Select a service…</option>
+            <option>Aerial Photography</option>
+            <option>Cinematic Video</option>
+            <option>Real Estate</option>
+            <option>Event / Wedding</option>
+            <option>Other</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="message">Tell Us About Your Project</label>
+          <textarea id="message" class="form-input" rows="5" placeholder="Location, date, any specific requirements…"></textarea>
+        </div>
+
+        <div style="text-align:center;margin-top:0.75rem;">
+          <button type="submit" class="btn-primary" style="padding:1rem 3.25rem;font-size:0.9rem;">
+            Send Enquiry &rarr;
+          </button>
+        </div>
+
+      </form>
+    </div>
+  </div>
+</section>
+
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!--  FOOTER                                                         -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<footer class="footer">
+  <div class="container">
+    <div class="footer-inner">
+      <img src="brand_assets/logo.png" alt="FlightSight" class="footer-logo">
+
+      <nav class="footer-nav" aria-label="Footer navigation">
+        <a href="#about"     class="footer-link">About</a>
+        <a href="#services"  class="footer-link">Services</a>
+        <a href="#portfolio" class="footer-link">Portfolio</a>
+        <a href="#equipment" class="footer-link">Equipment</a>
+        <a href="#process"   class="footer-link">Process</a>
+        <a href="#contact"   class="footer-link">Contact</a>
+      </nav>
+
+      <p class="footer-copy">&copy; 2025 FlightSight. All rights reserved.</p>
+    </div>
+  </div>
+</footer>
+
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!--  JAVASCRIPT                                                     -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<script>
+  // ── Nav scroll ────────────────────────────────────────────────
+  const nav = document.getElementById('nav');
+  window.addEventListener('scroll', () => {
+    nav.classList.toggle('scrolled', window.scrollY > 60);
+  }, { passive: true });
+
+  // ── Mobile menu ───────────────────────────────────────────────
+  const menuBtn  = document.getElementById('menuBtn');
+  const mobileNav = document.getElementById('mobileNav');
+  menuBtn.addEventListener('click', () => mobileNav.classList.toggle('open'));
+  function closeMobileNav() { mobileNav.classList.remove('open'); }
+
+  // ── Scroll reveal ─────────────────────────────────────────────
+  const revealObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('visible');
+        revealObserver.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.1 });
+
+  document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
+
+  // ── Count-up animation ────────────────────────────────────────
+  const counterObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (!entry.isIntersecting) return;
+      const el = entry.target;
+      const target = parseInt(el.dataset.count, 10);
+      const suffix = el.dataset.suffix || '+';
+      let current = 0;
+      const step = target / 55;
+      const timer = setInterval(() => {
+        current = Math.min(current + step, target);
+        el.textContent = Math.floor(current) + suffix;
+        if (current >= target) clearInterval(timer);
+      }, 28);
+      counterObserver.unobserve(el);
+    });
+  }, { threshold: 0.5 });
+
+  document.querySelectorAll('[data-count]').forEach(el => counterObserver.observe(el));
+
+  // ── Form submit ───────────────────────────────────────────────
+  function handleSubmit(e) {
+    e.preventDefault();
+    const btn = e.target.querySelector('button[type="submit"]');
+    const orig = btn.textContent;
+    btn.textContent = 'Sent! We\'ll be in touch soon.';
+    btn.style.background = '#22c55e';
+    btn.disabled = true;
+    setTimeout(() => {
+      btn.textContent = orig;
+      btn.style.background = '';
+      btn.disabled = false;
+      e.target.reset();
+    }, 4000);
+  }
+</script>
+
+</body>
+</html>
