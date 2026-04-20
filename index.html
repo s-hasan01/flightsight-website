@@ -435,6 +435,21 @@
       transform: translateY(0);
     }
 
+    /* ─── SWIPE HINT ────────────────────────────────────────────── */
+    .swipe-hint {
+      display: none;
+      align-items: center; justify-content: center; gap: 0.5rem;
+      margin-top: 1.25rem;
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 0.72rem; font-weight: 600; letter-spacing: 0.16em;
+      text-transform: uppercase; color: var(--text-muted);
+      animation: swipePulse 2s ease-in-out infinite;
+    }
+    @keyframes swipePulse {
+      0%, 100% { opacity: 0.5; }
+      50%       { opacity: 1; }
+    }
+
     /* ─── EQUIPMENT ──────────────────────────────────────────────── */
     .equipment-section {
       padding: 8rem 0; background: var(--bg-deep);
@@ -610,6 +625,7 @@
     }
     @media (max-width: 768px) {
       .scroll-indicator { display: flex; }
+      .swipe-hint { display: flex; }
       .nav { padding: 1.25rem 1.5rem; grid-template-columns: auto 1fr auto; }
       .nav.scrolled { padding: 1rem 1.5rem; }
       .nav-left { display: none; }
@@ -928,6 +944,17 @@
         </div>
       </div>
 
+      <!-- Mobile swipe hint -->
+      <div class="swipe-hint">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M5 12h14M13 6l6 6-6 6"/>
+        </svg>
+        <span>Swipe to explore</span>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M5 12h14M13 6l6 6-6 6"/>
+        </svg>
+      </div>
+
     </div>
   </div>
 </section>
@@ -1203,6 +1230,17 @@
       clone.setAttribute('aria-hidden', 'true');
       track.appendChild(clone);
     });
+
+    // Hide swipe hint after first scroll on mobile
+    const viewport = track.closest('.carousel-viewport');
+    const hint = document.querySelector('.swipe-hint');
+    if (hint) {
+      viewport.addEventListener('scroll', function onScroll() {
+        hint.style.opacity = '0';
+        hint.style.transition = 'opacity 0.4s ease';
+        viewport.removeEventListener('scroll', onScroll);
+      }, { passive: true });
+    }
   })();
 
   // ── Form submit ───────────────────────────────────────────────
