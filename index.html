@@ -139,16 +139,30 @@
     .mobile-nav {
       display: none; position: fixed; inset: 0; z-index: 98;
       background: rgba(8,9,16,0.97); backdrop-filter: blur(24px);
-      flex-direction: column; align-items: center; justify-content: center; gap: 2rem;
+      flex-direction: column; align-items: center; justify-content: center; gap: 1.5rem;
     }
     .mobile-nav.open { display: flex; }
     .mobile-nav a {
-      font-family: 'Anton', sans-serif; font-size: 2.75rem;
-      color: var(--text-primary); text-decoration: none;
-      text-transform: uppercase; letter-spacing: 0.04em;
+      font-family: 'Barlow Condensed', sans-serif; font-size: 1.375rem;
+      font-weight: 700; letter-spacing: 0.14em;
+      color: rgba(236,242,249,0.75); text-decoration: none;
+      text-transform: uppercase; text-align: center;
       transition: color 0.2s ease;
     }
     .mobile-nav a:hover { color: var(--accent); }
+    .mobile-nav-cta {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 1rem; font-weight: 700; letter-spacing: 0.13em;
+      text-transform: uppercase; text-decoration: none;
+      color: var(--bg-deep) !important; background: var(--accent);
+      padding: 0.75rem 2.25rem; border-radius: 2px; margin-top: 0.5rem;
+      transition: background 0.2s ease, transform 0.2s cubic-bezier(0.16,1,0.3,1), box-shadow 0.2s ease !important;
+    }
+    .mobile-nav-cta:hover {
+      background: #7DD3FC !important; color: var(--bg-deep) !important;
+      transform: translateY(-1px) !important;
+      box-shadow: 0 6px 24px rgba(56,189,248,0.32) !important;
+    }
 
     /* ─── HERO ───────────────────────────────────────────────────── */
     .hero {
@@ -717,7 +731,8 @@
   <a href="#portfolio" onclick="closeMobileNav()">Portfolio</a>
   <a href="#equipment" onclick="closeMobileNav()">Equipment</a>
   <a href="#process"   onclick="closeMobileNav()">Process</a>
-  <a href="#contact"   onclick="closeMobileNav()">Book a Shoot</a>
+  <a href="#contact"   onclick="closeMobileNav()">Contact</a>
+  <a href="#contact" class="mobile-nav-cta" onclick="closeMobileNav()">Book Now</a>
 </div>
 
 
@@ -893,16 +908,16 @@
       <div class="carousel-viewport">
         <div class="carousel-track" id="carouselTrack">
 
-          <!-- Slide 1 — Real Estate -->
+          <!-- Slide 1 — Personal Shoot -->
           <div class="carousel-slide">
             <video class="p-vid" autoplay muted loop playsinline>
-              <source src="brand_assets/real_estate.mp4" type="video/mp4">
+              <source src="brand_assets/car_edit.mp4" type="video/mp4">
             </video>
             <div class="p-overlay"></div>
             <div class="p-info">
-              <span class="p-cat">Real Estate</span>
-              <span class="p-title">Real Estate</span>
-              <p class="p-desc">Showcase high-value properties from above — stunning aerials that help homes command premium prices.</p>
+              <span class="p-cat">Videography</span>
+              <span class="p-title">Cinematic Video</span>
+              <p class="p-desc">Bespoke aerial sessions tailored to your vision — personal projects executed with cinematic craft.</p>
             </div>
           </div>
 
@@ -928,16 +943,16 @@
             </div>
           </div>
 
-          <!-- Slide 4 — Personal Shoot -->
+          <!-- Slide 4 — Real Estate -->
           <div class="carousel-slide">
             <video class="p-vid" autoplay muted loop playsinline>
-              <source src="brand_assets/car_edit.mp4" type="video/mp4">
+              <source src="brand_assets/real_estate.mp4" type="video/mp4">
             </video>
             <div class="p-overlay"></div>
             <div class="p-info">
-              <span class="p-cat">Personal</span>
-              <span class="p-title">Personal Shoot</span>
-              <p class="p-desc">Bespoke aerial sessions tailored to your vision — personal projects executed with cinematic craft.</p>
+              <span class="p-cat">Real Estate</span>
+              <span class="p-title">Real Estate</span>
+              <p class="p-desc">Showcase high-value properties from above — stunning aerials that help homes command premium prices.</p>
             </div>
           </div>
 
@@ -1107,7 +1122,10 @@
         Tell us about your project and we'll get back to you within 24 hours to discuss how we can capture your vision from above.
       </p>
 
-      <form style="text-align:left;display:grid;gap:1.125rem;" class="reveal" onsubmit="handleSubmit(event)">
+      <form style="text-align:left;display:grid;gap:1.125rem;" class="reveal" action="https://formsubmit.co/flight0011@gmail.com" method="POST">
+        <input type="hidden" name="_subject" value="New FlightSight Enquiry">
+        <input type="hidden" name="_captcha" value="false">
+        <input type="hidden" name="_template" value="table">
 
         <div class="form-row">
           <div class="form-group">
@@ -1144,6 +1162,9 @@
         </div>
 
       </form>
+      <p style="font-size:0.78rem;color:var(--text-muted);margin-top:1.25rem;text-align:center;">
+        Note: Your first submission activates the email connection — you may receive a one-time confirmation email from FormSubmit.
+      </p>
     </div>
   </div>
 </section>
