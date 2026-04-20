@@ -620,7 +620,35 @@
       .container { padding: 0 1.5rem; }
       .about-grid { grid-template-columns: 1fr; gap: 2.5rem; }
       .services-grid { grid-template-columns: 1fr; }
-      .carousel-slide { flex: 0 0 280px; height: 280px; }
+      /* Portfolio carousel — mobile overrides */
+      .portfolio-section { padding: 5rem 0; }
+      .carousel-outer { margin-top: 2rem; }
+      .carousel-viewport {
+        overflow-x: auto;
+        overflow-y: hidden;
+        -webkit-overflow-scrolling: touch;
+        scroll-snap-type: x mandatory;
+        scroll-padding: 0 1.5rem;
+        -webkit-mask-image: none;
+        mask-image: none;
+        padding: 0 1.5rem 1rem;
+        /* hide scrollbar */
+        scrollbar-width: none;
+      }
+      .carousel-viewport::-webkit-scrollbar { display: none; }
+      .carousel-track {
+        animation: none;
+        width: auto;
+        flex-wrap: nowrap;
+      }
+      .carousel-slide {
+        flex: 0 0 80vw;
+        max-width: 320px;
+        height: 300px;
+        scroll-snap-align: start;
+      }
+      /* hide cloned slides on mobile so only originals show */
+      .carousel-slide[aria-hidden="true"] { display: none; }
       .stats-grid { grid-template-columns: repeat(2, 1fr); }
       .process-grid { grid-template-columns: 1fr; }
       .equipment-grid { grid-template-columns: 1fr; gap: 2.5rem; }
