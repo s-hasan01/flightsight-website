@@ -1,0 +1,6 @@
+CLAUDE.md
+.DS_Store
+.idea/
+node_modules/
+temporary_screenshots/
+*.mov
