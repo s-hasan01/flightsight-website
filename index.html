@@ -76,6 +76,16 @@
         padding     0.45s cubic-bezier(0.16,1,0.3,1),
         border-color 0.45s cubic-bezier(0.16,1,0.3,1);
     }
+    /* Always fill the notch/status-bar area with dark colour */
+    .nav::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: env(safe-area-inset-top, 0px);
+      background: rgba(8,9,16,0.97);
+      pointer-events: none;
+      z-index: -1;
+    }
     .nav.scrolled {
       background: rgba(8,9,16,0.93);
       backdrop-filter: blur(22px);
@@ -961,8 +971,7 @@
 <!-- ═══════════════════════════════════════════════════════════════ -->
 <section class="hero" id="home">
   <video class="hero-video" autoplay muted loop playsinline preload="none">
-    <source src="brand_assets/hero_mobile.mp4" type="video/mp4" media="(max-width: 768px)">
-    <source src="brand_assets/hero_desktop.mp4" type="video/mp4">
+    <source src="brand_assets/hero_1080.mp4" type="video/mp4">
   </video>
   <div class="hero-overlay"></div>
   <div class="hero-vignette"></div>
