@@ -2,7 +2,8 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="theme-color" content="#080910">
   <meta name="description" content="FlightSight — Professional aerial photography and videography. Capturing breathtaking perspectives from above.">
   <title>FlightSight — Aerial Photography & Videography</title>
 
@@ -68,6 +69,7 @@
       position: fixed; top: 0; left: 0; right: 0; z-index: 100;
       display: grid; grid-template-columns: 1fr auto 1fr; align-items: center;
       padding: 1.5rem 3rem;
+      padding-top: max(1.5rem, calc(env(safe-area-inset-top) + 0.75rem));
       border-bottom: 1px solid transparent;
       transition:
         background  0.45s cubic-bezier(0.16,1,0.3,1),
@@ -654,6 +656,13 @@
     .equip-selector:hover .equip-selector-label,
     .equip-selector.active .equip-selector-label { color: var(--accent); }
     .equip-selector.active img { transform: scale(1.04); }
+    /* Touch devices: only .active controls glow, suppress :hover bleed */
+    @media (hover: none) {
+      .equip-selector:hover .equip-selector-inner { border-color: var(--border); box-shadow: none; }
+      .equip-selector:hover .equip-selector-label { color: var(--text-muted); }
+      .equip-selector.active .equip-selector-inner { border-color: var(--accent); box-shadow: 0 0 0 1px var(--border-accent), 0 0 22px rgba(56,189,248,0.18); }
+      .equip-selector.active .equip-selector-label { color: var(--accent); }
+    }
 
     /* ─── STATS ──────────────────────────────────────────────────── */
     .stats-section {
@@ -777,10 +786,25 @@
     }
 
     /* ─── SWIPE HINT (mobile only) ──────────────────────────────── */
+    .services-scroll-dots {
+      display: none;
+      align-items: center; justify-content: center; gap: 0.5rem;
+      margin-top: 1.25rem;
+    }
+    .sdot {
+      display: block; width: 7px; height: 7px; border-radius: 50%;
+      background: var(--border);
+      transition: background 0.25s ease, transform 0.25s ease, width 0.25s ease;
+      flex-shrink: 0;
+    }
+    .sdot.active {
+      background: var(--accent);
+      transform: scale(1.25);
+    }
     .swipe-hint-mobile {
       display: none;
       align-items: center; justify-content: center; gap: 0.6rem;
-      margin-top: 1.25rem;
+      margin-top: 0.75rem;
       opacity: 0.65;
     }
     .swipe-hint-mobile span {
@@ -876,8 +900,9 @@
       .form-row { grid-template-columns: 1fr; }
       .footer-inner { flex-direction: column; align-items: flex-start; }
 
-      /* ── Show swipe hints ── */
+      /* ── Show swipe hints + dots ── */
       .swipe-hint-mobile { display: flex; }
+      .services-scroll-dots { display: flex; }
     }
   </style>
 </head>
@@ -920,13 +945,13 @@
 </nav>
 
 <div class="mobile-nav" id="mobileNav">
-  <a href="#about"     onclick="closeMobileNav()">About</a>
-  <a href="#services"  onclick="closeMobileNav()">Services</a>
-  <a href="#portfolio" onclick="closeMobileNav()">Portfolio</a>
-  <a href="#equipment" onclick="closeMobileNav()">Equipment</a>
-  <a href="#process"   onclick="closeMobileNav()">Process</a>
-  <a href="#contact"   onclick="closeMobileNav()">Contact</a>
-  <a href="#contact" class="mobile-nav-cta" onclick="closeMobileNav()">Book Now</a>
+  <a href="#about"      onclick="mobileNavTo(event,'about')">About</a>
+  <a href="#services"   onclick="mobileNavTo(event,'services')">Services</a>
+  <a href="#portfolio"  onclick="mobileNavTo(event,'portfolio')">Portfolio</a>
+  <a href="#equipment"  onclick="mobileNavTo(event,'equipment')">Equipment</a>
+  <a href="#process"    onclick="mobileNavTo(event,'process')">Process</a>
+  <a href="#contact"    onclick="mobileNavTo(event,'contact')">Contact</a>
+  <a href="#contact" class="mobile-nav-cta" onclick="mobileNavTo(event,'contact')">Book Now</a>
 </div>
 
 
@@ -1107,6 +1132,12 @@
 
     </div>
 
+    <div class="services-scroll-dots" id="servicesDots">
+      <span class="sdot active"></span>
+      <span class="sdot"></span>
+      <span class="sdot"></span>
+      <span class="sdot"></span>
+    </div>
     <div class="swipe-hint-mobile">
       <span class="swipe-arrow">←</span>
       <span>Swipe</span>
@@ -1432,6 +1463,14 @@
   const mobileNav = document.getElementById('mobileNav');
   menuBtn.addEventListener('click', () => mobileNav.classList.toggle('open'));
   function closeMobileNav() { mobileNav.classList.remove('open'); }
+  function mobileNavTo(e, id) {
+    e.preventDefault();
+    mobileNav.classList.remove('open');
+    requestAnimationFrame(() => {
+      const target = document.getElementById(id);
+      if (target) target.scrollIntoView({ behavior: 'smooth' });
+    });
+  }
 
   // ── Scroll reveal ─────────────────────────────────────────────
   const revealObserver = new IntersectionObserver((entries) => {
@@ -1472,6 +1511,20 @@
     btn.classList.add('active');
     document.getElementById('panel-' + btn.dataset.target).classList.add('active');
   }
+
+  // ── Services scroll dots ─────────────────────────────────────
+  (function () {
+    const grid = document.querySelector('.services-grid');
+    const dots = document.querySelectorAll('#servicesDots .sdot');
+    if (!grid || !dots.length) return;
+    grid.addEventListener('scroll', () => {
+      const card = grid.querySelector('.service-card');
+      if (!card) return;
+      const cardW = card.offsetWidth + 16; // card + 1rem gap
+      const idx = Math.min(Math.round(grid.scrollLeft / cardW), dots.length - 1);
+      dots.forEach((d, i) => d.classList.toggle('active', i === idx));
+    }, { passive: true });
+  })();
 
   // ── Service cards — tap to reveal description on mobile ──────
   (function () {
