@@ -9,9 +9,9 @@
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Anton&family=Barlow+Condensed:wght@400;500;600;700&family=Figtree:ital,wght@0,300;0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Anton&family=Barlow+Condensed:wght@400;500;600;700&family=Figtree:ital,wght@0,300;0,400;0,500;0,600;1,400&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
+  <noscript><link href="https://fonts.googleapis.com/css2?family=Anton&family=Barlow+Condensed:wght@400;500;600;700&family=Figtree:ital,wght@0,300;0,400;0,500;0,600;1,400&display=swap" rel="stylesheet"></noscript>
 
-  <script src="https://cdn.tailwindcss.com"></script>
 
   <style>
     /* ─── CUSTOM PROPERTIES ──────────────────────────────────────── */
@@ -170,6 +170,7 @@
     .hero {
       position: relative; height: 100vh; min-height: 680px;
       overflow: hidden; display: flex; align-items: center; justify-content: center;
+      background: var(--bg-deep);
     }
     .hero-video {
       position: absolute; inset: 0;
@@ -840,6 +841,10 @@
       .nav-right { gap: 0; justify-content: flex-end; }
       .container { padding: 0 1.5rem; }
 
+      /* ── Hero: hide video on mobile, rely on poster + dark bg ── */
+      .hero-video { display: none; }
+      .hero { background: var(--bg-deep); }
+
       /* ── Partners banner ── */
       .partners-banner { padding: 1.875rem 0; }
       .partners-inner { flex-direction: row; gap: 1.5rem; align-items: center; justify-content: center; padding: 0 1.5rem; }
@@ -959,7 +964,7 @@
 <!--  HERO                                                           -->
 <!-- ═══════════════════════════════════════════════════════════════ -->
 <section class="hero" id="home">
-  <video class="hero-video" autoplay muted loop playsinline>
+  <video class="hero-video" autoplay muted loop playsinline preload="none" poster="brand_assets/website image example.webp">
     <source src="brand_assets/hero_sectionvid.mp4" type="video/mp4">
   </video>
   <div class="hero-overlay"></div>
@@ -1065,7 +1070,7 @@
       <!-- 01 Aerial Photography -->
       <div class="service-card reveal d1">
         <div class="card-media">
-          <img src="brand_assets/clutch.JPG" alt="">
+          <img src="brand_assets/clutch_opt.webp" alt="" loading="lazy">
           <div class="card-media-overlay"></div>
         </div>
         <h3 class="card-title">Aerial Photography</h3>
@@ -1081,7 +1086,7 @@
       <!-- 02 Cinematic Video -->
       <div class="service-card reveal d2">
         <div class="card-media">
-          <video autoplay muted loop playsinline>
+          <video autoplay muted loop playsinline preload="none">
             <source src="brand_assets/car_edit.mp4" type="video/mp4">
           </video>
           <div class="card-media-overlay"></div>
@@ -1099,7 +1104,7 @@
       <!-- 03 Real Estate -->
       <div class="service-card reveal d3">
         <div class="card-media">
-          <video autoplay muted loop playsinline>
+          <video autoplay muted loop playsinline preload="none">
             <source src="brand_assets/real_estate.mp4" type="video/mp4">
           </video>
           <div class="card-media-overlay"></div>
@@ -1117,7 +1122,7 @@
       <!-- 04 Events & Weddings -->
       <div class="service-card reveal d4">
         <div class="card-media">
-          <img src="brand_assets/wedding.webp" alt="">
+          <img src="brand_assets/wedding_opt.webp" alt="" loading="lazy">
           <div class="card-media-overlay"></div>
         </div>
         <h3 class="card-title">Events & Weddings</h3>
@@ -1182,22 +1187,22 @@
       <div class="featured-grid">
         <!-- Large hero — drone shot of Clutch sign -->
         <div class="featured-img-wrap span-row">
-          <img src="brand_assets/featured_project/dji_fly_20250604_104800_418_1749048505522_photo_optimized.jpg" alt="Clutch building sign — aerial">
+          <img src="brand_assets/featured_project/fp1.webp" alt="Clutch building sign — aerial" loading="lazy">
           <span class="img-label">Aerial · Clutch HQ</span>
         </div>
         <!-- Top right — service centre exterior -->
         <div class="featured-img-wrap span-col">
-          <img src="brand_assets/featured_project/IMG_3647.JPG" alt="Clutch service centre exterior">
+          <img src="brand_assets/featured_project/IMG_3647.webp" alt="Clutch service centre exterior" loading="lazy">
           <span class="img-label">Exterior · Service Centre</span>
         </div>
         <!-- Bottom right — garage interior -->
         <div class="featured-img-wrap">
-          <img src="brand_assets/featured_project/dji_fly_20250604_141812_444_1749061270222_photo_optimized.jpg" alt="Clutch service garage interior">
+          <img src="brand_assets/featured_project/fp2.webp" alt="Clutch service garage interior" loading="lazy">
           <span class="img-label">Interior · Workshop</span>
         </div>
         <!-- Bottom right last — behind the scenes -->
         <div class="featured-img-wrap">
-          <img src="brand_assets/featured_project/DSC02080.jpeg" alt="Behind the scenes">
+          <img src="brand_assets/featured_project/DSC02080.webp" alt="Behind the scenes" loading="lazy">
           <span class="img-label">Behind the Scenes</span>
         </div>
       </div>
@@ -1268,14 +1273,14 @@
 
         <button class="equip-selector active" data-target="drone" onclick="selectEquip(this)">
           <div class="equip-selector-inner">
-            <img src="brand_assets/djimini3-no_background.png" alt="DJI Mini 3 Pro">
+            <img src="brand_assets/djimini3-no_bg.webp" alt="DJI Mini 3 Pro" loading="lazy">
           </div>
           <span class="equip-selector-label">DJI Mini 3 Pro</span>
         </button>
 
         <button class="equip-selector" data-target="camera" onclick="selectEquip(this)">
           <div class="equip-selector-inner">
-            <img src="brand_assets/sony.webp" alt="Sony a6700">
+            <img src="brand_assets/sony_opt.webp" alt="Sony a6700" loading="lazy">
           </div>
           <span class="equip-selector-label">Sony a6700</span>
         </button>
